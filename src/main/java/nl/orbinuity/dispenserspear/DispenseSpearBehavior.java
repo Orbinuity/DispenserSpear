@@ -23,14 +23,19 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Objects;
 
 public class DispenseSpearBehavior implements DispenseItemBehavior {
     public static final String dispensedSpearId = "dispenserspear:dispensed_spear";
 
+    private static final net.minecraft.core.dispenser.DefaultDispenseItemBehavior DEFAULT_BEHAVIOR =
+            new net.minecraft.core.dispenser.DefaultDispenseItemBehavior();
+
     @Override
-    public ItemStack dispense(BlockSource source, ItemStack stack) {
+    public ItemStack dispense(BlockSource source, @NonNull ItemStack stack) {
         Level level = source.level();
         if (level.isClientSide()) return stack;
 
@@ -51,14 +56,14 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
 
         if (!existingSpears.isEmpty()) {
             Item storedItem = Items.AIR;
-            ItemDisplay existingSpear = existingSpears.get(0);
+            ItemDisplay existingSpear = existingSpears.getFirst();
 
             for (String tag : existingSpear.getTags()) {
                 if (tag.startsWith("item_id:")) {
                     String targetId = tag.substring("item_id:".length());
 
                     for (Item candidate : ForgeRegistries.ITEMS.getValues()) {
-                        String candidateId = ForgeRegistries.ITEMS.getKey(candidate).toString();
+                        String candidateId = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(candidate)).toString();
                         if (candidateId.equals(targetId)) {
                             storedItem = candidate;
                             break;
@@ -69,6 +74,10 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             }
 
             if (storedItem == null || storedItem == Items.AIR) {
+                level.players().get(0).displayClientMessage(
+                        net.minecraft.network.chat.Component.literal("FUCK!"),
+                        false
+                );
                 storedItem = stack.getItem();
             }
 
@@ -76,7 +85,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
                 spear.discard();
             }
 
-            if (stack.getCount() < stack.getMaxStackSize()) {
+            if (stack.getCount() < stack.getMaxStackSize() && isSpear(stack.getItem())) {
                 stack.grow(1);
             } else {
                 ItemStack refundStack = new ItemStack(storedItem);
@@ -97,60 +106,69 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             return stack;
         }
 
-        double x = targetPos.getX() + 0.5;
-        double y = targetPos.getY() + 0.5;
-        double z = targetPos.getZ() + 0.5;
+        if (isSpear(stack.getItem())) {
+            double x = targetPos.getX() + 0.5;
+            double y = targetPos.getY() + 0.5;
+            double z = targetPos.getZ() + 0.5;
 
-        ItemStack item = stack.copy();
-        item.setCount(1);
+            ItemStack item = stack.copy();
+            item.setCount(1);
 
-        ItemDisplay spearStand = new ItemDisplay(EntityType.ITEM_DISPLAY, level);
+            ItemDisplay spearStand = new ItemDisplay(EntityType.ITEM_DISPLAY, level);
 
-        CompoundTag rootNbt = new CompoundTag();
+            CompoundTag rootNbt = new CompoundTag();
 
-        Tag itemNbt = ItemStack.CODEC
-                .encodeStart(level.registryAccess().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), item)
-                .getOrThrow(IllegalStateException::new);
+            Tag itemNbt = ItemStack.CODEC
+                    .encodeStart(level.registryAccess().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), item)
+                    .getOrThrow(IllegalStateException::new);
 
-        rootNbt.put("item", itemNbt);
+            rootNbt.put("item", itemNbt);
 
-        Matrix4f mathMatrix = getSpearMatrix(direction);
+            Matrix4f mathMatrix = getSpearMatrix(direction);
 
-        mathMatrix.transpose();
+            mathMatrix.transpose();
 
-        float[] matrixData = new float[16];
-        mathMatrix.get(matrixData);
+            float[] matrixData = new float[16];
+            mathMatrix.get(matrixData);
 
-        rootNbt.put("transformation", transformList(matrixData));
-        rootNbt.putString("item_display", "fixed");
-        rootNbt.putString("CustomName", stack.getDisplayName().getString());
+            rootNbt.put("transformation", transformList(matrixData));
+            rootNbt.putString("item_display", "fixed");
+            rootNbt.putString("CustomName", stack.getDisplayName().getString());
 
-        spearStand.deserializeNBT(level.registryAccess(), rootNbt);
+            spearStand.deserializeNBT(level.registryAccess(), rootNbt);
 
-        spearStand.setPos(x, y, z);
-        spearStand.addTag(dispensedSpearId);
+            spearStand.setPos(x, y, z);
+            spearStand.addTag(dispensedSpearId);
 
-        String cleanOrigin = "origin:" + sourcePos.getX() + "," + sourcePos.getY() + "," + sourcePos.getZ();
-        spearStand.addTag(cleanOrigin);
+            String cleanOrigin = "origin:" + sourcePos.getX() + "," + sourcePos.getY() + "," + sourcePos.getZ();
+            spearStand.addTag(cleanOrigin);
 
-        String itemId = ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
-        spearStand.addTag("item_id:" + itemId);
+            String itemId = ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
+            spearStand.addTag("item_id:" + itemId);
 
-        // TODO: Add collision to the spear
-        CompoundTag posTag = new CompoundTag();
-        posTag.putInt("X", sourcePos.getX());
-        posTag.putInt("Y", sourcePos.getY());
-        posTag.putInt("Z", sourcePos.getZ());
-        spearStand.getPersistentData().put("SourcePos", posTag);
+            CompoundTag posTag = new CompoundTag();
+            posTag.putInt("X", sourcePos.getX());
+            posTag.putInt("Y", sourcePos.getY());
+            posTag.putInt("Z", sourcePos.getZ());
+            spearStand.getPersistentData().put("SourcePos", posTag);
 
-        level.addFreshEntity(spearStand);
+            level.addFreshEntity(spearStand);
 
-        for (LivingEntity damageEntity : damageEntities) {
-            damageEntity.hurt(level.damageSources().trident(spearStand, null), 8.0f);
+            for (LivingEntity damageEntity : damageEntities) {
+                damageEntity.hurt(level.damageSources().trident(spearStand, null), 8.0f);
+            }
+
+            stack.shrink(1);
+            return stack;
+        } else {
+            return DEFAULT_BEHAVIOR.dispense(source, stack);
         }
+    }
 
-        stack.shrink(1);
-        return stack;
+    private boolean isSpear(Item item) {
+        return item == Items.WOODEN_SPEAR || item == Items.STONE_SPEAR ||
+                item == Items.COPPER_SPEAR || item == Items.GOLDEN_SPEAR ||
+                item == Items.DIAMOND_SPEAR || item == Items.NETHERITE_SPEAR;
     }
 
     private Matrix4f getSpearMatrix(Direction facing) {
