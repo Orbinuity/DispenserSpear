@@ -3,14 +3,13 @@ package nl.orbinuity.dispenserspear;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.BlockSource;
+import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.FloatTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.*;
 import net.minecraft.world.entity.Display.ItemDisplay;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -25,14 +24,20 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.jspecify.annotations.NonNull;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class DispenseSpearBehavior implements DispenseItemBehavior {
-    public static final String dispensedSpearId = "dispenserspear:dispensed_spear";
-
-    private static final net.minecraft.core.dispenser.DefaultDispenseItemBehavior DEFAULT_BEHAVIOR =
-            new net.minecraft.core.dispenser.DefaultDispenseItemBehavior();
+    public static final String dispensedSpearId = DispenserSpear.MODID + ":dispensed_spear";
+    public static final Map<String, Float> spearDamage = Map.of(
+            "minecraft:wooden_spear", 3f,
+            "minecraft:stone_spear", 4f,
+            "minecraft:copper_spear", 4f,
+            "minecraft:iron_spear", 5f,
+            "minecraft:golden_spear", 3f,
+            "minecraft:diamond_spear", 6f,
+            "minecraft:netherite_spear", 7f
+    );
+    private static final DefaultDispenseItemBehavior DEFAULT_BEHAVIOR = new DefaultDispenseItemBehavior();
 
     @Override
     public ItemStack dispense(BlockSource source, @NonNull ItemStack stack) {
@@ -58,26 +63,21 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             Item storedItem = Items.AIR;
             ItemDisplay existingSpear = existingSpears.getFirst();
 
-            for (String tag : existingSpear.getTags()) {
-                if (tag.startsWith("item_id:")) {
-                    String targetId = tag.substring("item_id:".length());
+            Optional<String> itemId = existingSpear.getTags().stream()
+                    .filter(s -> s.startsWith("item_id:"))
+                    .findFirst();
 
-                    for (Item candidate : ForgeRegistries.ITEMS.getValues()) {
-                        String candidateId = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(candidate)).toString();
-                        if (candidateId.equals(targetId)) {
-                            storedItem = candidate;
-                            break;
-                        }
+            if (itemId.isPresent()) {
+                for (Item candidate : ForgeRegistries.ITEMS.getValues()) {
+                    String candidateId = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(candidate)).toString();
+                    if (candidateId.equals(itemId.get().substring("item_id:".length()))) {
+                        storedItem = candidate;
+                        break;
                     }
-                    break;
                 }
             }
 
             if (storedItem == null || storedItem == Items.AIR) {
-                level.players().get(0).displayClientMessage(
-                        net.minecraft.network.chat.Component.literal("FUCK!"),
-                        false
-                );
                 storedItem = stack.getItem();
             }
 
@@ -95,7 +95,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
                     be.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
                         ItemStack remainder = ItemHandlerHelper.insertItemStacked(handler, refundStack, false);
                         if (!remainder.isEmpty()) {
-                            net.minecraft.world.entity.item.ItemEntity drop = new net.minecraft.world.entity.item.ItemEntity(
+                            ItemEntity drop = new ItemEntity(
                                     level, sourcePos.getX() + 0.5, sourcePos.getY() + 0.5, sourcePos.getZ() + 0.5, remainder
                             );
                             level.addFreshEntity(drop);
@@ -119,7 +119,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             CompoundTag rootNbt = new CompoundTag();
 
             Tag itemNbt = ItemStack.CODEC
-                    .encodeStart(level.registryAccess().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), item)
+                    .encodeStart(level.registryAccess().createSerializationContext(NbtOps.INSTANCE), item)
                     .getOrThrow(IllegalStateException::new);
 
             rootNbt.put("item", itemNbt);
@@ -143,7 +143,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             String cleanOrigin = "origin:" + sourcePos.getX() + "," + sourcePos.getY() + "," + sourcePos.getZ();
             spearStand.addTag(cleanOrigin);
 
-            String itemId = ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
+            String itemId = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack.getItem())).toString();
             spearStand.addTag("item_id:" + itemId);
 
             CompoundTag posTag = new CompoundTag();
@@ -155,7 +155,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             level.addFreshEntity(spearStand);
 
             for (LivingEntity damageEntity : damageEntities) {
-                damageEntity.hurt(level.damageSources().trident(spearStand, null), 8.0f);
+                damageEntity.hurt(level.damageSources().trident(spearStand, null), spearDamage.get(itemId));
             }
 
             stack.shrink(1);
@@ -167,8 +167,9 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
 
     private boolean isSpear(Item item) {
         return item == Items.WOODEN_SPEAR || item == Items.STONE_SPEAR ||
-                item == Items.COPPER_SPEAR || item == Items.GOLDEN_SPEAR ||
-                item == Items.DIAMOND_SPEAR || item == Items.NETHERITE_SPEAR;
+                item == Items.IRON_SPEAR || item == Items.COPPER_SPEAR ||
+                item == Items.GOLDEN_SPEAR || item == Items.DIAMOND_SPEAR ||
+                item == Items.NETHERITE_SPEAR;
     }
 
     private Matrix4f getSpearMatrix(Direction facing) {
