@@ -1,27 +1,41 @@
-# Dispenser Spear
+![Dispenser Spear](banner.png)
 
 [![License](https://img.shields.io/github/license/Orbinuity/DispenserSpear)](./LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/Orbinuity/DispenserSpear)](https://github.com/Orbinuity/DispenserSpear/commits)
 [![Language](https://img.shields.io/badge/Language-Java-blue)](https://www.java.com/)
-[![Version](https://img.shields.io/badge/Version-1.0--beta.1-orange)](https://github.com/Orbinuity/DispenserSpear/releases/v1.0-beta.1)
+[![Version](https://img.shields.io/badge/Version-1.0-orange)](https://github.com/Orbinuity/DispenserSpear/releases/v1.0)
 [![Made By](https://img.shields.io/badge/Made%20by-Orbinuity-teal)](https://orbinuity.github.io/)
 
 Make dispensers use spears like a weapon!
 
+## Info
+
+Every spear gives their own 'Jab' damage:
+
+| Spear Type |                                                                                                                                             Damage                                                                                                                                              |
+|:-----------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Wooden     | <img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Half Hart" src="https://www.nicepng.com/png/full/72-727302_minecraft-transparent-half-a-heart-minecraft-heart-png.png" width="15" height="15">  |
+| Stone      | <img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15">  |
+| Copper     | <img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15">  |
+| Iron       | <img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Half Hart" src="https://www.nicepng.com/png/full/72-727302_minecraft-transparent-half-a-heart-minecraft-heart-png.png" width="15" height="15">  |
+| Golden     | <img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Half Hart" src="https://www.nicepng.com/png/full/72-727302_minecraft-transparent-half-a-heart-minecraft-heart-png.png" width="15" height="15">  |
+| Diamond    | <img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15">  |
+| Netherite  | <img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Half Hart" src="https://www.nicepng.com/png/full/72-727302_minecraft-transparent-half-a-heart-minecraft-heart-png.png" width="15" height="15">  |
+
+You need to put 2 spears in a dispenser to make it work, we are still trying to make it work with just 1.
+
 ## Added / Fixed
 
-- Join message only shows on join and not every level load (Bug)
-- Fixed mods.toml: issueTrackerURL, displayURL, logoFile, credits, updateJSONURL are now added (Bug)
-- Spear now retracts even if other item in dispenser is not spear (Bug)
+- Spear breaks if the dispenser is broken (Bug)
+- Every spear attacks at its own damage (Feat)
+- Iron spear also works now (Bug)
+- Now using a banner in mod menu (Feat)
 
 ## Plans
 
-For now we want to add:
-
 - Make spear also retract if dispenser is empty (Bug)
-- Add command for clean up (Idea)
-- Add collision to the spear (Idea)
-- Make every spear hit with its own attack damage (Idea)
+- Fix spear names (Bug)
+- Add collision to the spear (Feat)
 
 ## License
 
