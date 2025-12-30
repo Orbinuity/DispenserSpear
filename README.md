@@ -1,4 +1,4 @@
-![Dispenser Spear](banner.png)
+![Dispenser Spear](https://data.orbinuity.nl/DispenserSpear/banner.png)
 
 [![License](https://img.shields.io/github/license/Orbinuity/DispenserSpear)](./LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/Orbinuity/DispenserSpear)](https://github.com/Orbinuity/DispenserSpear/commits)
