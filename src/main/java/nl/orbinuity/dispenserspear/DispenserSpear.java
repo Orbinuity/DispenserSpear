@@ -1,6 +1,9 @@
 package nl.orbinuity.dispenserspear;
 
+import com.mojang.serialization.DataResult;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Display.ItemDisplay;
@@ -29,7 +32,6 @@ import java.util.Optional;
 @Mod(DispenserSpear.MODID)
 public class DispenserSpear {
     public static final String MODID = "dispenserspear";
-    private final java.util.Set<BlockPos> poweredDispensers = new java.util.HashSet<>();
 
     public DispenserSpear(FMLJavaModLoadingContext context) {
         BusGroup busGroup = context.getModBusGroup();
@@ -107,28 +109,15 @@ public class DispenserSpear {
                             display.discard();
                         }*/
                     } else {
-                        Item storedItem = Items.AIR;
+                        ItemStack storedItem = display.getPickResult();
 
-                        Optional<String> itemId = display.getTags().stream()
-                                .filter(s -> s.startsWith("item_id:"))
-                                .findFirst();
-
-                        if (itemId.isEmpty()) continue;
-
-                        for (Item candidate : ForgeRegistries.ITEMS.getValues()) {
-                            String candidateId = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(candidate)).toString();
-                            if (candidateId.equals(itemId.get().substring("item_id:".length()))) {
-                                storedItem = candidate;
-                                break;
-                            }
-                        }
-
+                        assert storedItem != null;
                         ItemEntity item = new ItemEntity(
                                 level,
                                 dispenserPos.getX() + 0.5,
                                 dispenserPos.getY() + 0.5,
                                 dispenserPos.getZ() + 0.5,
-                                new ItemStack(storedItem)
+                                storedItem
                         );
 
                         level.addFreshEntity(item);
