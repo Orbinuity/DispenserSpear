@@ -26,15 +26,12 @@ You need to put 2 spears in a dispenser to make it work, we are still trying to 
 
 ## Added / Fixed
 
-- Spear breaks if the dispenser is broken (Bug)
-- Every spear attacks at its own damage (Feat)
-- Iron spear also works now (Bug)
-- Now using a banner in mod menu (Feat)
+- Fixed spear names (Bug)
+- When spear retract it now keeps item data (Bug)
 
 ## Plans
 
 - Make spear also retract if dispenser is empty (Bug)
-- Fix spear names (Bug)
 - Add collision to the spear (Feat)
 
 ## License
