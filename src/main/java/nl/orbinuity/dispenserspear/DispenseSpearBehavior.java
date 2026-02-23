@@ -1,10 +1,13 @@
 package nl.orbinuity.dispenserspear;
 
+import com.mojang.serialization.DataResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.*;
 import net.minecraft.world.entity.Display.ItemDisplay;
 import net.minecraft.world.entity.EntityType;
@@ -16,6 +19,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.DispenserBlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -60,25 +64,12 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
         );
 
         if (!existingSpears.isEmpty()) {
-            Item storedItem = Items.AIR;
             ItemDisplay existingSpear = existingSpears.getFirst();
 
-            Optional<String> itemId = existingSpear.getTags().stream()
-                    .filter(s -> s.startsWith("item_id:"))
-                    .findFirst();
+            ItemStack storedItemStack = existingSpear.getSlot(0).get();
 
-            if (itemId.isPresent()) {
-                for (Item candidate : ForgeRegistries.ITEMS.getValues()) {
-                    String candidateId = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(candidate)).toString();
-                    if (candidateId.equals(itemId.get().substring("item_id:".length()))) {
-                        storedItem = candidate;
-                        break;
-                    }
-                }
-            }
-
-            if (storedItem == null || storedItem == Items.AIR) {
-                storedItem = stack.getItem();
+            if (storedItemStack.isEmpty()) {
+                storedItemStack = stack;
             }
 
             for (ItemDisplay spear : existingSpears) {
@@ -88,7 +79,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             if (stack.getCount() < stack.getMaxStackSize() && isSpear(stack.getItem())) {
                 stack.grow(1);
             } else {
-                ItemStack refundStack = new ItemStack(storedItem);
+                ItemStack refundStack = storedItemStack.copy();
                 BlockEntity be = source.blockEntity();
 
                 if (be != null) {
@@ -133,7 +124,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
 
             rootNbt.put("transformation", transformList(matrixData));
             rootNbt.putString("item_display", "fixed");
-            rootNbt.putString("CustomName", stack.getDisplayName().getString());
+            rootNbt.putString("CustomName", stack.getHoverName().getString());
 
             spearStand.deserializeNBT(level.registryAccess(), rootNbt);
 
@@ -142,9 +133,6 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
 
             String cleanOrigin = "origin:" + sourcePos.getX() + "," + sourcePos.getY() + "," + sourcePos.getZ();
             spearStand.addTag(cleanOrigin);
-
-            String itemId = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack.getItem())).toString();
-            spearStand.addTag("item_id:" + itemId);
 
             CompoundTag posTag = new CompoundTag();
             posTag.putInt("X", sourcePos.getX());
@@ -155,6 +143,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             level.addFreshEntity(spearStand);
 
             for (LivingEntity damageEntity : damageEntities) {
+                String itemId = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack.getItem())).toString();
                 damageEntity.hurt(level.damageSources().trident(spearStand, null), spearDamage.get(itemId));
             }
 
