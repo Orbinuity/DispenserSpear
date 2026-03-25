@@ -1,7 +1,5 @@
 package nl.orbinuity.dispenserspear;
 
-import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -35,11 +33,20 @@ import org.joml.Quaternionf;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class DispenseSpearBehavior implements DispenseItemBehavior {
     public static final String dispensedSpearId = "dispenserspear:dispensed_spear";
-
+    public static final Map<String, Float> spearDamage = Map.of(
+            "minecraft:wooden_spear", 3f,
+            "minecraft:stone_spear", 4f,
+            "minecraft:copper_spear", 4f,
+            "minecraft:iron_spear", 5f,
+            "minecraft:golden_spear", 3f,
+            "minecraft:diamond_spear", 6f,
+            "minecraft:netherite_spear", 7f
+    );
     private static final net.minecraft.core.dispenser.DefaultDispenseItemBehavior DEFAULT_BEHAVIOR =
             new net.minecraft.core.dispenser.DefaultDispenseItemBehavior();
 
@@ -67,14 +74,18 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             Item storedItem = Items.AIR;
             Display.ItemDisplay existingSpear = existingSpears.getFirst();
 
-            for (String tag : existingSpear.getTags()) {
-                if (tag.startsWith("item_id:")) {
-                    String targetId = tag.substring("item_id:".length());
+            Optional<String> itemId = existingSpear.getTags().stream()
+                    .filter(s -> s.startsWith("item_id:"))
+                    .findFirst();
 
-                    Identifier itemId = Identifier.parse("");
-                    Optional<Holder.Reference<Item>> optionalStoredItem = BuiltInRegistries.ITEM.get(itemId);
-                    storedItem = optionalStoredItem.map(Holder.Reference::value).orElse(Items.AIR);
-                    break;
+            if (itemId.isPresent()) {
+                for (String tag : existingSpear.getTags()) {
+                    if (tag.startsWith("item_id:")) {
+                        Identifier itemIdentifier = Identifier.parse(itemId.get().substring("item_id:".length()));
+                        Optional<Holder.Reference<Item>> optionalStoredItem = BuiltInRegistries.ITEM.get(itemIdentifier);
+                        storedItem = optionalStoredItem.map(Holder.Reference::value).orElse(Items.AIR);
+                        break;
+                    }
                 }
             }
 
@@ -86,7 +97,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
                 spear.discard();
             }
 
-            if (stack.getCount() < stack.getMaxStackSize()) {
+            if (stack.getCount() < stack.getMaxStackSize() && isSpear(stack.getItem())) {
                 stack.grow(1);
             } else {
                 ItemStack refundStack = new ItemStack(storedItem);
@@ -167,9 +178,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             rootNbt.putString("item_display", "fixed");
             rootNbt.putString("CustomName", stack.getDisplayName().getString());
 
-            ProblemReporter.Collector reporter = new ProblemReporter.Collector();
-
-            spearStand.load(TagValueInput.create(reporter, level.registryAccess(), rootNbt));
+            spearStand.load(TagValueInput.create(new ProblemReporter.Collector(), level.registryAccess(), rootNbt));
 
             spearStand.setPos(x, y, z);
             spearStand.addTag(dispensedSpearId);
@@ -183,7 +192,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             level.addFreshEntity(spearStand);
 
             for (LivingEntity damageEntity : damageEntities) {
-                damageEntity.hurt(level.damageSources().trident(spearStand, null), 8.0f);
+                damageEntity.hurt(level.damageSources().trident(spearStand, null), spearDamage.get(itemId));
             }
 
             stack.shrink(1);
