@@ -17,8 +17,6 @@
 	"entrypoints": {
 		"main": [
 			"nl.orbinuity.dispenserspear.DispenserSpear"
-		],
-		"client": [
 		]
 	},
 	"depends": {
