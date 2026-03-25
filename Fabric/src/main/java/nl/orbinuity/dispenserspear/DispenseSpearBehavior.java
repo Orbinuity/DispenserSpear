@@ -34,10 +34,11 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 public class DispenseSpearBehavior implements DispenseItemBehavior {
-    public static final String dispensedSpearId = "dispenserspear:dispensed_spear";
+    public static final String dispensedSpearId = DispenserSpear.MODID + ":dispensed_spear";
     public static final Map<String, Float> spearDamage = Map.of(
             "minecraft:wooden_spear", 3f,
             "minecraft:stone_spear", 4f,
@@ -71,26 +72,12 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
         );
 
         if (!existingSpears.isEmpty()) {
-            Item storedItem = Items.AIR;
             Display.ItemDisplay existingSpear = existingSpears.getFirst();
 
-            Optional<String> itemId = existingSpear.getTags().stream()
-                    .filter(s -> s.startsWith("item_id:"))
-                    .findFirst();
+            ItemStack storedItemStack = existingSpear.getSlot(0).get();
 
-            if (itemId.isPresent()) {
-                for (String tag : existingSpear.getTags()) {
-                    if (tag.startsWith("item_id:")) {
-                        Identifier itemIdentifier = Identifier.parse(itemId.get().substring("item_id:".length()));
-                        Optional<Holder.Reference<Item>> optionalStoredItem = BuiltInRegistries.ITEM.get(itemIdentifier);
-                        storedItem = optionalStoredItem.map(Holder.Reference::value).orElse(Items.AIR);
-                        break;
-                    }
-                }
-            }
-
-            if (storedItem == Items.AIR) {
-                storedItem = stack.getItem();
+            if (storedItemStack.isEmpty()) {
+                storedItemStack = stack;
             }
 
             for (Display.ItemDisplay spear : existingSpears) {
@@ -100,7 +87,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             if (stack.getCount() < stack.getMaxStackSize() && isSpear(stack.getItem())) {
                 stack.grow(1);
             } else {
-                ItemStack refundStack = new ItemStack(storedItem);
+                ItemStack refundStack = storedItemStack.copy();
                 BlockEntity be = source.blockEntity();
 
                 if (be != null) {
@@ -176,7 +163,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
 
             rootNbt.put("transformation", transformList(matrixData));
             rootNbt.putString("item_display", "fixed");
-            rootNbt.putString("CustomName", stack.getDisplayName().getString());
+            rootNbt.putString("CustomName", stack.getHoverName().getString());
 
             spearStand.load(TagValueInput.create(new ProblemReporter.Collector(), level.registryAccess(), rootNbt));
 
@@ -186,12 +173,10 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             String cleanOrigin = "origin:" + sourcePos.getX() + "," + sourcePos.getY() + "," + sourcePos.getZ();
             spearStand.addTag(cleanOrigin);
 
-            String itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
-            spearStand.addTag("item_id:" + itemId);
-
             level.addFreshEntity(spearStand);
 
             for (LivingEntity damageEntity : damageEntities) {
+                String itemId = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(stack.getItem())).toString();
                 damageEntity.hurt(level.damageSources().trident(spearStand, null), spearDamage.get(itemId));
             }
 
