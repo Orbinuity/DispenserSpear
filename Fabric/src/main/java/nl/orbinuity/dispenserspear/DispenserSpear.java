@@ -90,24 +90,15 @@ public class DispenserSpear implements ModInitializer {
                             display.discard();
                         }*/
 					} else {
-						Item storedItem;
+						ItemStack storedItem = display.getPickResult();
 
-						String itemId = display.getTags().stream()
-								.filter(s -> s.startsWith("item_id:"))
-								.findFirst().orElse("");
-
-						if (itemId.isEmpty()) continue;
-
-						Identifier itemIdentifier = Identifier.parse(itemId);
-						Optional<Holder.Reference<Item>> optionalStoredItem = BuiltInRegistries.ITEM.get(itemIdentifier);
-						storedItem = optionalStoredItem.map(Holder.Reference::value).orElse(Items.AIR);
-
+						assert storedItem != null;
 						ItemEntity item = new ItemEntity(
 								level,
 								dispenserPos.getX() + 0.5,
 								dispenserPos.getY() + 0.5,
 								dispenserPos.getZ() + 0.5,
-								new ItemStack(storedItem)
+								storedItem
 						);
 
 						level.addFreshEntity(item);
