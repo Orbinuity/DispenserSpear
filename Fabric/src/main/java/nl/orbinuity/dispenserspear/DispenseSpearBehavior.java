@@ -32,6 +32,7 @@ import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.AABB;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,8 +40,11 @@ import java.util.Optional;
 public class DispenseSpearBehavior implements DispenseItemBehavior {
     public static final String dispensedSpearId = "dispenserspear:dispensed_spear";
 
+    private static final net.minecraft.core.dispenser.DefaultDispenseItemBehavior DEFAULT_BEHAVIOR =
+            new net.minecraft.core.dispenser.DefaultDispenseItemBehavior();
+
     @Override
-    public ItemStack dispense(BlockSource source, ItemStack stack) {
+    public ItemStack dispense(BlockSource source, @NonNull ItemStack stack) {
         Level level = source.level();
         if (level.isClientSide()) return stack;
 
@@ -61,7 +65,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
 
         if (!existingSpears.isEmpty()) {
             Item storedItem = Items.AIR;
-            Display.ItemDisplay existingSpear = existingSpears.get(0);
+            Display.ItemDisplay existingSpear = existingSpears.getFirst();
 
             for (String tag : existingSpear.getTags()) {
                 if (tag.startsWith("item_id:")) {
@@ -134,59 +138,65 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             return stack;
         }
 
-        double x = targetPos.getX() + 0.5;
-        double y = targetPos.getY() + 0.5;
-        double z = targetPos.getZ() + 0.5;
+        if (isSpear(stack.getItem())) {
+            double x = targetPos.getX() + 0.5;
+            double y = targetPos.getY() + 0.5;
+            double z = targetPos.getZ() + 0.5;
 
-        ItemStack item = stack.copy();
-        item.setCount(1);
+            ItemStack item = stack.copy();
+            item.setCount(1);
 
-        Display.ItemDisplay spearStand = new Display.ItemDisplay(EntityType.ITEM_DISPLAY, level);
+            Display.ItemDisplay spearStand = new Display.ItemDisplay(EntityType.ITEM_DISPLAY, level);
 
-        CompoundTag rootNbt = new CompoundTag();
+            CompoundTag rootNbt = new CompoundTag();
 
-        Tag itemNbt = ItemStack.CODEC
-                .encodeStart(level.registryAccess().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), item)
-                .getOrThrow(IllegalStateException::new);
+            Tag itemNbt = ItemStack.CODEC
+                    .encodeStart(level.registryAccess().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), item)
+                    .getOrThrow(IllegalStateException::new);
 
-        rootNbt.put("item", itemNbt);
+            rootNbt.put("item", itemNbt);
 
-        Matrix4f mathMatrix = getSpearMatrix(direction);
+            Matrix4f mathMatrix = getSpearMatrix(direction);
 
-        mathMatrix.transpose();
+            mathMatrix.transpose();
 
-        float[] matrixData = new float[16];
-        mathMatrix.get(matrixData);
+            float[] matrixData = new float[16];
+            mathMatrix.get(matrixData);
 
-        rootNbt.put("transformation", transformList(matrixData));
-        rootNbt.putString("item_display", "fixed");
-        rootNbt.putString("CustomName", stack.getDisplayName().getString());
+            rootNbt.put("transformation", transformList(matrixData));
+            rootNbt.putString("item_display", "fixed");
+            rootNbt.putString("CustomName", stack.getDisplayName().getString());
 
-        ProblemReporter.Collector reporter = new ProblemReporter.Collector();
+            ProblemReporter.Collector reporter = new ProblemReporter.Collector();
 
-        var valueInput = TagValueInput.create(reporter, level.registryAccess(), rootNbt);
+            spearStand.load(TagValueInput.create(reporter, level.registryAccess(), rootNbt));
 
-        spearStand.load(valueInput);
+            spearStand.setPos(x, y, z);
+            spearStand.addTag(dispensedSpearId);
 
-        spearStand.setPos(x, y, z);
-        spearStand.addTag(dispensedSpearId);
+            String cleanOrigin = "origin:" + sourcePos.getX() + "," + sourcePos.getY() + "," + sourcePos.getZ();
+            spearStand.addTag(cleanOrigin);
 
-        String cleanOrigin = "origin:" + sourcePos.getX() + "," + sourcePos.getY() + "," + sourcePos.getZ();
-        spearStand.addTag(cleanOrigin);
+            String itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
+            spearStand.addTag("item_id:" + itemId);
 
-        String itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
-        spearStand.addTag("item_id:" + itemId);
+            level.addFreshEntity(spearStand);
 
-        // TODO: Add collision to the spear
+            for (LivingEntity damageEntity : damageEntities) {
+                damageEntity.hurt(level.damageSources().trident(spearStand, null), 8.0f);
+            }
 
-        level.addFreshEntity(spearStand);
-
-        for (LivingEntity damageEntity : damageEntities) {
-            damageEntity.hurt(level.damageSources().trident(spearStand, null), 8.0f);
+            stack.shrink(1);
+            return stack;
+        } else {
+            return DEFAULT_BEHAVIOR.dispense(source, stack);
         }
+    }
 
-        stack.shrink(1);
-        return stack;
+    private boolean isSpear(Item item) {
+        return item == Items.WOODEN_SPEAR || item == Items.STONE_SPEAR ||
+                item == Items.COPPER_SPEAR || item == Items.GOLDEN_SPEAR ||
+                item == Items.DIAMOND_SPEAR || item == Items.NETHERITE_SPEAR;
     }
 
     private Matrix4f getSpearMatrix(Direction facing) {
