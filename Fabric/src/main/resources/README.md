@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/github/license/Orbinuity/DispenserSpear)](./LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/Orbinuity/DispenserSpear)](https://github.com/Orbinuity/DispenserSpear/commits)
 [![Language](https://img.shields.io/badge/Language-Java-blue)](https://www.java.com/)
-[![Version](https://img.shields.io/badge/Version-1.0-orange)](https://github.com/Orbinuity/DispenserSpear/releases/v1.0)
+[![Version](https://img.shields.io/badge/Version-2.0-orange)](https://github.com/Orbinuity/DispenserSpear/releases/v2.0)
 [![Made By](https://img.shields.io/badge/Made%20by-Orbinuity-teal)](https://orbinuity.github.io/)
 
 Make dispensers use spears like a weapon!
@@ -26,15 +26,12 @@ You need to put 2 spears in a dispenser to make it work, we are still trying to 
 
 ## Added / Fixed
 
-- Spear breaks if the dispenser is broken (Bug)
-- Every spear attacks at its own damage (Feat)
-- Iron spear also works now (Bug)
-- Now using a banner in mod menu (Feat)
+- Fixed spear names (Bug)
+- When spear retract it now keeps item data (Bug)
 
 ## Plans
 
 - Make spear also retract if dispenser is empty (Bug)
-- Fix spear names (Bug)
 - Add collision to the spear (Feat)
 
 ## License
