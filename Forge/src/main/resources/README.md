@@ -1,10 +1,10 @@
 ![Dispenser Spear](https://data.orbinuity.nl/DispenserSpear/banner.png)
 
-[![License](https://img.shields.io/github/license/Orbinuity/DispenserSpear)](./LICENSE)
+[![License](https://img.shields.io/github/license/Orbinuity/DispenserSpear)](https://orbinuity.nl/license)
 [![Last Commit](https://img.shields.io/github/last-commit/Orbinuity/DispenserSpear)](https://github.com/Orbinuity/DispenserSpear/commits)
 [![Language](https://img.shields.io/badge/Language-Java-blue)](https://www.java.com/)
 [![Version](https://img.shields.io/badge/Version-2.1-orange)](https://github.com/Orbinuity/DispenserSpear/releases/v2.1)
-[![Made By](https://img.shields.io/badge/Made%20by-Orbinuity-teal)](https://orbinuity.github.io/)
+[![Made By](https://img.shields.io/badge/Made%20by-Orbinuity-teal)](https://orbinuity.nl/)
 
 Make dispensers use spears like a weapon!
 
@@ -39,4 +39,4 @@ You need to put 2 spears in a dispenser to make it work, we are still trying to 
 
 ## License
 
-Before copying any part of this project, please read the [LICENSE](./LICENSE) file to understand the terms and conditions.
+Before copying any part of this project, please read the [LICENSE](https://orbinuity.nl/license) file to understand the terms and conditions.
