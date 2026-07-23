@@ -10,7 +10,7 @@ issueTrackerURL="https://github.com/Orbinuity/DispenserSpear/issues" #optional
 
 [[mods]]
 modId="dispenserspear"
-version="2.1+1.21.11-forge"
+version="2.1+26.1-forge"
 displayName="Dispenser Spear"
 updateJSONURL="https://data.orbinuity.nl/DispenserSpear/update.json" #optional
 displayURL="https://orbinuity.nl/project/DispenserSpear" #optional
