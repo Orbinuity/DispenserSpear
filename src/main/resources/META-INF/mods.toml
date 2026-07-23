@@ -1,0 +1,38 @@
+# See https://docs.minecraftforge.net/en/1.21.x/gettingstarted/modfiles/#modstoml
+# There are lots of things you can do with the mods.toml, and not all fields are included with this MDK
+# References: https://github.com/MinecraftForge/MDKExamples
+
+modLoader="javafml"
+loaderVersion="[62,)"
+license="BSD-3-Clause"
+issueTrackerURL="https://github.com/Orbinuity/DispenserSpear/issues" #optional
+#clientSideOnly=true #optional, default=false
+
+[[mods]]
+modId="dispenserspear"
+version="2.1+1.21.11-forge"
+displayName="Dispenser Spear"
+updateJSONURL="https://data.orbinuity.nl/DispenserSpear/update.json" #optional
+displayURL="https://orbinuity.nl/project/DispenserSpear" #optional
+logoFile="banner.png" #optional
+credits="Orbinuity" #optional
+authors="Orbinuity" #optional
+#displayTest="MATCH_VERSION" #optional, default=MATCH_VERSION when not clientSideOnly, else IGNORE_ALL_VERSION
+
+description='''Make dispensers use spears like a weapon!
+
+Made by Orbinuity: https://orbinuity.nl'''
+
+[[dependencies.dispenserspear]] #recommended
+    modId="forge"
+    mandatory=true
+    versionRange="[62,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.dispenserspear]] #recommended
+    modId="minecraft"
+    mandatory=true
+    versionRange="[26.1,26.2,)"
+    ordering="NONE"
+    side="BOTH"
