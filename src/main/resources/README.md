@@ -1,12 +1,12 @@
 ![Dispenser Spear](https://data.orbinuity.nl/DispenserSpear/banner.png)
 
-[![License](https://img.shields.io/github/license/Orbinuity/DispenserSpear)](./LICENSE)
+[![License](https://img.shields.io/github/license/Orbinuity/DispenserSpear)](https://orbinuity.nl/license)
 [![Last Commit](https://img.shields.io/github/last-commit/Orbinuity/DispenserSpear)](https://github.com/Orbinuity/DispenserSpear/commits)
 ![Language](https://img.shields.io/badge/Language-Java-blue)
-[![Version](https://img.shields.io/badge/Version-2.0-orange)](https://github.com/Orbinuity/DispenserSpear/releases/v2.0+1.21.11-fabric)
+[![Version](https://img.shields.io/badge/Version-2.1-orange)](https://github.com/Orbinuity/DispenserSpear/releases/v2.1+1.21.11-fabric)
 ![Fabric](https://img.shields.io/badge/Modloader-Fabric-dbb673)
 ![Minecraft Version](https://img.shields.io/badge/Minecraft%20version-1.21.11-blue)
-[![Made By](https://img.shields.io/badge/Made%20by-Orbinuity-teal)](https://orbinuity.github.io/)
+[![Made By](https://img.shields.io/badge/Made%20by-Orbinuity-teal)](https://orbinuity.nl/)
 
 Make dispensers use spears like a weapon!
 
@@ -28,14 +28,17 @@ You need to put 2 spears in a dispenser to make it work, we are still trying to 
 
 ## Added / Fixed
 
-- Fixed spear names (Bug)
-- When spear retract it now keeps item data (Bug)
+- If you break a dispenser while spear is extended the game crashed ([Origin](https://github.com/Orbinuity/DispenserSpear/issues/1)) (Bug)
+- Make spear also retract if dispenser is empty (Bug)
+- Added a helper class for public functions (Feat)
+- using orbinuity link as home page instead of curse forge (Feat)
 
 ## Plans
 
-- Make spear also retract if dispenser is empty (Bug)
+- Add sound effects (Feat)
 - Add collision to the spear (Feat)
+- Make enchantments work (Feat)
 
 ## License
 
-Before copying any part of this project, please read the [LICENSE](./LICENSE) file to understand the terms and conditions.
+Before copying any part of this project, please read the [LICENSE](https://orbinuity.nl/license) file to understand the terms and conditions.
