@@ -6,7 +6,6 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
 import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,15 +13,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.FloatTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -35,11 +31,9 @@ import org.jspecify.annotations.NonNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 public class DispenseSpearBehavior implements DispenseItemBehavior {
-    public static final String dispensedSpearId = DispenserSpear.MODID + ":dispensed_spear";
-    public static final Map<String, Float> spearDamage = Map.of(
+    private static final Map<String, Float> spearDamage = Map.of(
             "minecraft:wooden_spear", 3f,
             "minecraft:stone_spear", 4f,
             "minecraft:copper_spear", 4f,
@@ -52,7 +46,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             new net.minecraft.core.dispenser.DefaultDispenseItemBehavior();
 
     @Override
-    public ItemStack dispense(BlockSource source, @NonNull ItemStack stack) {
+    public @NonNull ItemStack dispense(BlockSource source, @NonNull ItemStack stack) {
         Level level = source.level();
         if (level.isClientSide()) return stack;
 
@@ -63,7 +57,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
         List<Display.ItemDisplay> existingSpears = level.getEntitiesOfClass(
                 Display.ItemDisplay.class,
                 new AABB(targetPos).inflate(0.5),
-                entity -> entity.getTags().contains(dispensedSpearId) && entity.getTags().contains("origin:" + sourcePos.getX() + "," + sourcePos.getY() + "," + sourcePos.getZ())
+                entity -> entity.getTags().contains(DispenserSpearHelper.dispensedSpearId) && entity.getTags().contains("origin:" + sourcePos.getX() + "," + sourcePos.getY() + "," + sourcePos.getZ())
         );
 
         List<LivingEntity> damageEntities = level.getEntitiesOfClass(
@@ -74,7 +68,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
         if (!existingSpears.isEmpty()) {
             Display.ItemDisplay existingSpear = existingSpears.getFirst();
 
-            ItemStack storedItemStack = existingSpear.getSlot(0).get();
+            ItemStack storedItemStack = Objects.requireNonNull(existingSpear.getSlot(0)).get();
 
             if (storedItemStack.isEmpty()) {
                 storedItemStack = stack;
@@ -84,51 +78,49 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
                 spear.discard();
             }
 
-            if (stack.getCount() < stack.getMaxStackSize() && isSpear(stack.getItem())) {
+            if (stack.getCount() < stack.getMaxStackSize() && DispenserSpearHelper.isSpear(stack.getItem())) {
                 stack.grow(1);
             } else {
                 ItemStack refundStack = storedItemStack.copy();
                 BlockEntity be = source.blockEntity();
 
-                if (be != null) {
-                    Direction side = Direction.UP;
+                Direction side = Direction.UP;
 
-                    if (be.getLevel() != null) {
-                        Storage<ItemVariant> handler = ItemStorage.SIDED.find(
-                                be.getLevel(),
-                                be.getBlockPos(),
-                                be.getBlockState(),
-                                be,
-                                side
-                        );
+                if (be.getLevel() != null) {
+                    Storage<ItemVariant> handler = ItemStorage.SIDED.find(
+                            be.getLevel(),
+                            be.getBlockPos(),
+                            be.getBlockState(),
+                            be,
+                            side
+                    );
 
-                        if (handler != null) {
-                            long insertedAmount = 0;
+                    if (handler != null) {
+                        long insertedAmount;
 
-                            try (Transaction transaction = Transaction.openOuter()) {
-                                insertedAmount = handler.insert(
-                                        ItemVariant.of(refundStack),
-                                        refundStack.getCount(),
-                                        transaction
-                                );
-                                transaction.commit();
-                            }
+                        try (Transaction transaction = Transaction.openOuter()) {
+                            insertedAmount = handler.insert(
+                                    ItemVariant.of(refundStack),
+                                    refundStack.getCount(),
+                                    transaction
+                            );
+                            transaction.commit();
+                        }
 
-                            ItemStack remainder = refundStack.copy();
-                            remainder.shrink((int) insertedAmount);
+                        ItemStack remainder = refundStack.copy();
+                        remainder.shrink((int) insertedAmount);
 
-                            if (!remainder.isEmpty()) {
-                                ItemEntity drop = new ItemEntity(
-                                        level,
-                                        sourcePos.getX() + 0.5,
-                                        sourcePos.getY() + 0.5,
-                                        sourcePos.getZ() + 0.5,
-                                        remainder
-                                );
-                                drop.setDefaultPickUpDelay();
+                        if (!remainder.isEmpty()) {
+                            ItemEntity drop = new ItemEntity(
+                                    level,
+                                    sourcePos.getX() + 0.5,
+                                    sourcePos.getY() + 0.5,
+                                    sourcePos.getZ() + 0.5,
+                                    remainder
+                            );
+                            drop.setDefaultPickUpDelay();
 
-                                level.addFreshEntity(drop);
-                            }
+                            level.addFreshEntity(drop);
                         }
                     }
                 }
@@ -136,7 +128,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             return stack;
         }
 
-        if (isSpear(stack.getItem())) {
+        if (DispenserSpearHelper.isSpear(stack.getItem())) {
             double x = targetPos.getX() + 0.5;
             double y = targetPos.getY() + 0.5;
             double z = targetPos.getZ() + 0.5;
@@ -168,7 +160,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
             spearStand.load(TagValueInput.create(new ProblemReporter.Collector(), level.registryAccess(), rootNbt));
 
             spearStand.setPos(x, y, z);
-            spearStand.addTag(dispensedSpearId);
+            spearStand.addTag(DispenserSpearHelper.dispensedSpearId);
 
             String cleanOrigin = "origin:" + sourcePos.getX() + "," + sourcePos.getY() + "," + sourcePos.getZ();
             spearStand.addTag(cleanOrigin);
@@ -185,12 +177,6 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
         } else {
             return DEFAULT_BEHAVIOR.dispense(source, stack);
         }
-    }
-
-    private boolean isSpear(Item item) {
-        return item == Items.WOODEN_SPEAR || item == Items.STONE_SPEAR ||
-                item == Items.COPPER_SPEAR || item == Items.GOLDEN_SPEAR ||
-                item == Items.DIAMOND_SPEAR || item == Items.NETHERITE_SPEAR;
     }
 
     private Matrix4f getSpearMatrix(Direction facing) {
@@ -215,7 +201,7 @@ public class DispenseSpearBehavior implements DispenseItemBehavior {
         return finalMatrix;
     }
 
-    public ListTag transformList(float[] transform) {
+    private ListTag transformList(float[] transform) {
         ListTag transformation = new ListTag();
         for (float val : transform) {
             transformation.add(FloatTag.valueOf(val));
