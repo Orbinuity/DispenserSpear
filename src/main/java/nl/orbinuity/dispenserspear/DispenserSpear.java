@@ -156,13 +156,13 @@ public class DispenserSpear {
         Player player = event.getEntity();
 
         if (!player.level().isClientSide()) {
-            String latestVersion = DispenserSpearHelper.getLatestVersion("https://data.orbinuity.nl/DispenserSpear/update.json");
-		    if (!DispenserSpearHelper.getCurrentVersion().equals(latestVersion)) {
+            String latestVersion = DispenserSpearHelper.getLatestVersion("https://api.modrinth.com/updates/dispenser-spear/forge_updates.json");
+		    if (!latestVersion.isEmpty() && !DispenserSpearHelper.getCurrentVersion().equals(latestVersion)) {
 			    Component link = Component.literal("v"+latestVersion)
 					.withStyle(style -> style
 							.withColor(ChatFormatting.BLUE)
 							.withUnderlined(true)
-							.withClickEvent(new ClickEvent.OpenUrl(URI.create("https://orbinuity.nl/project/DispenserSpear")))
+							.withClickEvent(new ClickEvent.OpenUrl(URI.create("https://orbinuity.nl/project#DispenserSpear")))
 							.withHoverEvent(new HoverEvent.ShowText(Component.literal("Click to open download page")))
 					);
 
