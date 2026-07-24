@@ -8,7 +8,8 @@
 		"Orbinuity"
 	],
 	"contact": {
-		"homepage": "https://orbinuity.nl/project/DispenserSpear",
+		"homepage": "https://orbinuity.nl/project#DispenserSpear",
+		"issues": "https://github.com/Orbinuity/DispenserSpear/issues",
 		"sources": "https://github.com/Orbinuity/DispenserSpear"
 	},
 	"license": "BSD-3-Clause",
@@ -25,7 +26,13 @@
 		"java": ">=21",
 		"fabric-api": "*"
 	},
-	"suggests": {
-		"another-mod": "*"
+	"custom": {
+		"modmenu": {
+			"update_checker": true,
+			"links": {
+				"Modrinth": "https://modrinth.com/mod/dispenser-spear",
+				"modmenu.donation": "https://www.patreon.com/cw/Orbinuity"
+			}
+		}
 	}
 }
