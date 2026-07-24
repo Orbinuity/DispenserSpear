@@ -37,17 +37,16 @@ public class DispenserSpearHelper {
                 .build();
 
         try {
-            // This stops the code and WAITS for the internet to respond
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
                 JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
                 if (json.has("promos")) {
                     JsonObject promos = json.getAsJsonObject("promos");
-                    String mcVersion = SharedConstants.getCurrentVersion().name(); // Use getName() instead of name()
+                    String mcVersion = SharedConstants.getCurrentVersion().name();
 
                     if (promos.has(mcVersion + "-latest")) {
-                        return promos.get(mcVersion + "-latest").getAsString(); // Return it right here!
+                        return promos.get(mcVersion + "-latest").getAsString();
                     }
                 }
             }
@@ -55,6 +54,6 @@ public class DispenserSpearHelper {
             System.out.println("[UpdateChecker] Failed to fetch or parse update JSON: " + e.getMessage());
         }
 
-        return ""; // Return empty string if it fails
+        return "";
     }
 }
