@@ -55,6 +55,6 @@ public class DispenserSpearHelper {
             System.out.println("[UpdateChecker] Failed to fetch or parse update JSON: " + e.getMessage());
         }
 
-        return ""; // Return empty string if it fails
+        return "";
     }
 }
