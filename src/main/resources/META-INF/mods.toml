@@ -10,12 +10,11 @@ issueTrackerURL="https://github.com/Orbinuity/DispenserSpear/issues" #optional
 
 [[mods]]
 modId="dispenserspear"
-version="2.1+26.1-forge"
+version="2.2+26.1-forge"
 displayName="Dispenser Spear"
-updateJSONURL="https://data.orbinuity.nl/DispenserSpear/update.json" #optional
-displayURL="https://orbinuity.nl/project/DispenserSpear" #optional
+updateJSONURL="https://api.modrinth.com/updates/dispenser-spear/forge_updates.json" #optional
+displayURL="https://orbinuity.nl/project#DispenserSpear" #optional
 logoFile="banner.png" #optional
-credits="Orbinuity" #optional
 authors="Orbinuity" #optional
 #displayTest="MATCH_VERSION" #optional, default=MATCH_VERSION when not clientSideOnly, else IGNORE_ALL_VERSION
 
