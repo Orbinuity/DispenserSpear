@@ -58,12 +58,8 @@ java {
 }
 
 jar {
-	def projectName = project.name
-	inputs.property "projectName", projectName
-
-	from("LICENSE") {
-		rename { "${it}_$projectName"}
-	}
+	from("LICENSE")
+	from("README.md")
 }
 
 // configure the maven publication
