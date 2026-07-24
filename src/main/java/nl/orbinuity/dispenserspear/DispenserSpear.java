@@ -71,11 +71,11 @@ public class DispenserSpear implements ModInitializer {
 						if (display.tickCount > 1) {
 							boolean thisLastPowerStatus = lastPowerStatus.get(dispenserPos) != null && lastPowerStatus.get(dispenserPos);
 							if (dispenser.isEmpty() && !thisLastPowerStatus && level.hasNeighborSignal(dispenserPos)) {
-								actionTicks.put(dispenserPos, level.getDayTime()+4);
+								actionTicks.put(dispenserPos, level.getGameTime()+4);
 							}
 						}
 
-						boolean thisActionTicks = actionTicks.get(dispenserPos) != null && actionTicks.get(dispenserPos) <= level.getDayTime();
+						boolean thisActionTicks = actionTicks.get(dispenserPos) != null && actionTicks.get(dispenserPos) <= level.getGameTime();
 						if (thisActionTicks) {
 							actionTicks.remove(dispenserPos);
 
