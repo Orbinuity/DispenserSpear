@@ -24,8 +24,6 @@ Every spear gives their own 'Jab' damage:
 | Diamond    | <img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15">  |
 | Netherite  | <img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Hart" src="https://www.nicepng.com/png/full/190-1905759_minecraft-heart-8-bit-heart-transparent.png" width="15" height="15"><img alt="Half Hart" src="https://www.nicepng.com/png/full/72-727302_minecraft-transparent-half-a-heart-minecraft-heart-png.png" width="15" height="15">  |
 
-You need to put 2 spears in a dispenser to make it work, we are still trying to make it work with just 1.
-
 ## Added / Fixed
 
 - If you break a dispenser while spear is extended the game crashed ([Origin](https://github.com/Orbinuity/DispenserSpear/issues/1)) (Bug)
