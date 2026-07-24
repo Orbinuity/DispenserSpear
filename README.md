@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/github/license/Orbinuity/DispenserSpear)](https://orbinuity.nl/license)
 [![Last Commit](https://img.shields.io/github/last-commit/Orbinuity/DispenserSpear)](https://github.com/Orbinuity/DispenserSpear/commits)
 ![Language](https://img.shields.io/badge/Language-Java-blue)
-[![Version](https://img.shields.io/badge/Version-2.2-orange)](https://github.com/Orbinuity/DispenserSpear/releases/v2.2+1.21.11-forge)
+[![Version](https://img.shields.io/badge/Version-2.3-orange)](https://github.com/Orbinuity/DispenserSpear/releases/v2.3+1.21.11-forge)
 ![Forge](https://img.shields.io/badge/Modloader-Forge-dbb673)
 ![Minecraft Version](https://img.shields.io/badge/Minecraft%20version-1.21.11-blue)
 [![Made By](https://img.shields.io/badge/Made%20by-Orbinuity-teal)](https://orbinuity.nl/)
