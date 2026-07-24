@@ -172,8 +172,8 @@ public class DispenserSpear implements ModInitializer {
 
 
 	private void onPlayerJoin(ServerGamePacketListenerImpl serverGamePacketListener, PacketSender packetSender, MinecraftServer minecraftServer) {
-		String latestVersion = DispenserSpearHelper.getLatestVersion("https://api.modrinth.com/updates/dispenser-spear/forge_updates.json");
-		if (!DispenserSpearHelper.getCurrentVersion().equals(latestVersion)) {
+		String latestVersion = DispenserSpearHelper.getLatestVersion("https://data.orbinuity.nl/DispenserSpear/fabric_updates.json");
+		if (!latestVersion.isEmpty() && !DispenserSpearHelper.getCurrentVersion().equals(latestVersion)) {
 			Component link = Component.literal("v"+latestVersion)
 					.withStyle(style -> style
 							.withColor(ChatFormatting.BLUE)
