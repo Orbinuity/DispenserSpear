@@ -9,7 +9,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '[7.0.17,8)'
 }
 
-version = '2.1+26.1-forge'
+version = '2.2+26.1-forge'
 group = 'nl.orbinuity.dispenserspear'
 
 // Mojang ships Java 25 to end users in 26.1+, so your mod should target Java 25.
@@ -41,6 +41,11 @@ minecraft {
             args '--mod', 'examplemod', '--all', '--output', layout.projectDirectory.dir('src/generated/resources'), '--existing', layout.projectDirectory.dir('src/main/resources')
         }
     }
+}
+
+jar {
+    from("LICENSE")
+    from("README.md")
 }
 
 repositories {
